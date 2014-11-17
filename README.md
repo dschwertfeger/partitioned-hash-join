@@ -11,3 +11,21 @@ The zipped input files can be found here:
 
 - [file1.txt](http://www2.informatik.hu-berlin.de/~wandelt/DWDM/file1.zip)
 - [file2.txt](http://www2.informatik.hu-berlin.de/~wandelt/DWDM/file2.zip)
+
+If you don't want to work on the complete set while developing, you can easily create smaller files with the following command:
+
+
+`$ cat file1.txt | head -1000000 > 1m.txt`
+
+This creates a file with only 1 million entries.
+
+
+## todo
+
+- make script more generic
+  - don't hard-code file names
+  - pass files as arguments when invoking the script
+- if possible, make it faster
+  - try lower number of buckets without hitting memory limit
+- test on delphi
+- finish README (how to invoke script)
