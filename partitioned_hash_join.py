@@ -1,17 +1,10 @@
 from io import open
 from os import makedirs, path
+from resource import RLIMIT_DATA, getrlimit, setrlimit
 from time import time
 
-import resource
-
-rsrc = resource.RLIMIT_STACK
-soft, hard = resource.getrlimit(rsrc)
-print 'Hard limit starts as  :', hard
-
-resource.setrlimit(rsrc, (soft, 50*1024**2)) #limit to one kilobyte
-
-soft, hard = resource.getrlimit(rsrc)
-print 'Hard limit changed to :', hard
+soft, hard = getrlimit(RLIMIT_DATA)
+setrlimit(RLIMIT_DATA, (soft, 50*1024**2)) #limit to 50 MB
 
 NR_OF_BUCKETS = 90
 R = 'r10m.txt'  # 'file1.txt'
