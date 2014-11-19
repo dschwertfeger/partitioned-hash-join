@@ -1,13 +1,9 @@
 from io import open
 from os import makedirs, path
-from resource import RLIMIT_DATA, setrlimit
 from time import time
 
-# limit memory to 50 MB
-soft = hard = 50*1024**2
-setrlimit(RLIMIT_DATA, (soft, hard))
-
 NR_OF_BUCKETS = 90
+
 R = 'r10m.txt'  # 'file1.txt'
 S = 's10m.txt'  # 'file2.txt'
 
