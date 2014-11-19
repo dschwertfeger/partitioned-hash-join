@@ -34,7 +34,7 @@ def partition(src_file, to):
             bucket = h1(line)
             to[bucket].write(line)
 
-def join_buckets():
+def join_buckets(r, s):
     result = dict()
     for bucket in xrange(NR_OF_BUCKETS):
         hash_table = build_hash_table(r[bucket])
@@ -68,6 +68,6 @@ if __name__=='__main__':
     s = init_buckets('s')
     partition(R, r)
     partition(S, s)
-    write(join_buckets())
+    write(join_buckets(r, s))
     elapsed_time = time() - start_time
     print elapsed_time
