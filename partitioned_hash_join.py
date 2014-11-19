@@ -2,7 +2,7 @@ from io import open
 from os import makedirs, path
 from time import time
 
-NR_OF_BUCKETS = 90
+NR_OF_BUCKETS = 150
 
 R = 'r10m.txt'  # 'file1.txt'
 S = 's10m.txt'  # 'file2.txt'
@@ -13,7 +13,7 @@ def init_buckets(name):
     return [open('./tmp/{}_{}.txt'.format(name, i), 'w') for i in xrange(NR_OF_BUCKETS)]
 
 def h1(line):
-    return int(line[1:3]) % NR_OF_BUCKETS
+    return int(line[1:4]) % NR_OF_BUCKETS
 
 def build_hash_table(from_file):
     hash_table = dict()
