@@ -24,10 +24,6 @@ Invoke the script, passing the files it should find the intersection for as argu
 
 `$ ./partitioned_hash_join.py -r file1.txt -s file2.txt`
 
-Optionally, you can pass the number of buckets for the partitioning step with the `-b` flag. The default is 150. Here's an example:
-
-`$ ./partitioned_hash_join.py -r file1.txt -s file2.txt -b 123`
-
 # Development
 
 If you don't want to work on the complete set while developing, you can easily create smaller files with the following command:
