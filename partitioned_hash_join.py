@@ -20,7 +20,7 @@ from os import makedirs, path
 from sys import argv, exit
 from time import time
 
-NR_OF_BUCKETS = 150
+NR_OF_BUCKETS = 900
 
 def build_hash_table(from_file):
     hash_table = dict()
@@ -41,7 +41,8 @@ def h1(line):
 def init_buckets(name):
     if not path.exists('./tmp'):
         makedirs('./tmp')
-    return [open('./tmp/{}_{}.txt'.format(name, i), 'w') for i in xrange(NR_OF_BUCKETS)]
+    return [open('./tmp/{}_{}.txt'.format(name, i), 'w')
+            for i in xrange(NR_OF_BUCKETS)]
 
 def join_buckets(r, s):
     result = dict()
@@ -49,6 +50,8 @@ def join_buckets(r, s):
         hash_table = build_hash_table(r[bucket])
         part = join(hash_table, s[bucket])
         result.update(part)
+        r[bucket].close()
+        s[bucket].close()
         del part
         del hash_table
     return result
@@ -68,7 +71,7 @@ def partition(src_file, to):
         for line in f:
             bucket = h1(line)
             to[bucket].write(line)
-
+    [to[x].close for x in xrange(NR_OF_BUCKETS)]
 
 def write(result_dict):
     with open('intersection.txt', 'w') as f:
