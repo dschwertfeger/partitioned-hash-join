@@ -3,40 +3,37 @@ import unittest
 from partitioned_hash_join import (
     build_hash_table,
     h1,
+    is_duplicate,
     join,
-    write
+    letters_for_result,
+    value_for_letter,
+    LETTERS
 )
-
 
 class PartitionedHashJoinTests(unittest.TestCase):
 
     def test_h1(self):
-        self.assertEqual(h1('H1234567890'), 12)
+        self.assertEqual(h1('H1234567890'), 123)
+
+    def test_is_duplicate(self):
+        self.assertTrue(is_duplicate(100, 100))
+        self.assertTrue(is_duplicate(10, 1010))
+        self.assertFalse(is_duplicate(100, 1010))
 
     def test_join(self):
         r = open('r_test_bucket.txt', 'r')
         s = open('s_test_bucket.txt', 'r')
         hash_table = build_hash_table(r)
         result = join(hash_table, s)
-        self.assertEqual(len(result.get('9019095166')), 3)
+        self.assertEqual(result.get('9019095166'), 100010001)
 
+    def test_value_for_letter(self):
+        for idx, l in enumerate(LETTERS):
+            self.assertEqual(10**idx, value_for_letter(l))
 
-    def test_create_result_file(self):
-        results = {488552576: set([u'D488552576\n', u'B488552576\n']),
-                   482241448: set([u'G482241448\n']),
-                   486356299: set([u'B486356299\n',
-                                   u'D486356299\n',
-                                   u'A486356299\n'])}
-        write(results)
-        expected_results = ['D488552576\n',
-                            'B488552576\n',
-                            'G482241448\n',
-                            'B486356299\n',
-                            'D486356299\n',
-                            'A486356299\n']
-        with open('result.txt') as f:
-            for line in f:
-                self.assertTrue(line in expected_results)
+    def test_letters_for_result(self):
+        self.assertTrue(x in letters_for_result(100100010) for x in ['F', 'B', 'I'])
+
 
 if __name__=='__main__':
     unittest.main()
