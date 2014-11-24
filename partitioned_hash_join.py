@@ -26,20 +26,6 @@ NR_OF_BUCKETS = 900
 LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 LETTER_TO_VALUE = dict((letter, 10**idx) for (idx, letter) in enumerate(LETTERS))
 
-def value_for_letter(letter):
-    return LETTER_TO_VALUE.get(letter)
-
-def letters_for_result(number):
-    letters = []
-    while number > 0:
-        idx = int(log10(number))
-        letters.append(LETTERS[idx])
-        number = number - 10**idx
-    return letters
-
-def is_duplicate(value, existing_value):
-    return (existing_value % (value * 10)) >= value
-
 def build_hash_table(from_file):
     hash_table = dict()
     with open(from_file.name, 'r') as f:
@@ -61,6 +47,9 @@ def init_buckets(name):
         makedirs('./tmp')
     return [open('./tmp/{}_{}.txt'.format(name, i), 'w')
             for i in xrange(NR_OF_BUCKETS)]
+
+def is_duplicate(value, existing_value):
+    return (existing_value % (value * 10)) >= value
 
 def join_buckets(r, s):
     f = open('intersection.txt', 'w')
@@ -87,6 +76,14 @@ def join(hash_table, file):
                     results[key] += value
     return results
 
+def letters_for_result(number):
+    letters = []
+    while number > 0:
+        idx = int(log10(number))
+        letters.append(LETTERS[idx])
+        number = number - 10**idx
+    return letters
+
 def partition(src_file, to):
     with open(src_file, 'rt') as f:
         for line in f:
@@ -96,6 +93,9 @@ def partition(src_file, to):
 
 def usage():
     print __doc__
+
+def value_for_letter(letter):
+    return LETTER_TO_VALUE.get(letter)
 
 def main(argv):
     R = None
