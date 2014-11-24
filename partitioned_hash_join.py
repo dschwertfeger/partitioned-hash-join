@@ -21,7 +21,7 @@ from math import log10
 from sys import argv, exit
 from time import time
 
-NR_OF_BUCKETS = 900
+NR_OF_BUCKETS = 450
 
 LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
 LETTER_TO_VALUE = dict((letter, 10**idx) for (idx, letter) in enumerate(LETTERS))
