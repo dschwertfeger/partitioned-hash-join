@@ -17,22 +17,40 @@ Options:
 from getopt import getopt, GetoptError
 from io import open
 from os import makedirs, path
+from math import log10
 from sys import argv, exit
 from time import time
 
 NR_OF_BUCKETS = 900
+
+LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+LETTER_TO_VALUE = dict((letter, 10**idx) for (idx, letter) in enumerate(LETTERS))
+
+def value_for_letter(letter):
+    return LETTER_TO_VALUE.get(letter)
+
+def letters_for_result(number):
+    letters = []
+    while number > 0:
+        idx = int(log10(number))
+        letters.append(LETTERS[idx])
+        number = number - 10**idx
+    return letters
+
+def is_duplicate(value, existing_value):
+    return (existing_value % (value * 10)) >= value
 
 def build_hash_table(from_file):
     hash_table = dict()
     with open(from_file.name, 'r') as f:
         for line in f:
             key = line[1:11]
-            # elimitinate duplicates
+            value = value_for_letter(line[0])
             if key in hash_table:
-                hash_table[key].add(line)
+                if not is_duplicate(value, hash_table[key]):
+                    hash_table[key] += value
             else:
-                hash_table[key] = set()
-                hash_table[key].add(line)
+                hash_table[key] = value
     return hash_table
 
 def h1(line):
@@ -45,25 +63,28 @@ def init_buckets(name):
             for i in xrange(NR_OF_BUCKETS)]
 
 def join_buckets(r, s):
-    result = dict()
+    f = open('intersection.txt', 'w')
     for bucket in xrange(NR_OF_BUCKETS):
         hash_table = build_hash_table(r[bucket])
         part = join(hash_table, s[bucket])
-        result.update(part)
         r[bucket].close()
         s[bucket].close()
-        del part
+        for key, value in part.iteritems():
+            for letter in letters_for_result(value):
+                f.write(letter + unicode(key) + '\n')
         del hash_table
-    return result
+        del part
 
 def join(hash_table, file):
     results = dict()
     with open(file.name, 'r') as f:
         for line in f:
             key = line[1:11]
+            value = value_for_letter(line[0])
             if key in hash_table:
                 results[key] = hash_table[key]
-                results[key].add(line)
+                if not is_duplicate(value, hash_table[key]):
+                    results[key] += value
     return results
 
 def partition(src_file, to):
@@ -72,12 +93,6 @@ def partition(src_file, to):
             bucket = h1(line)
             to[bucket].write(line)
     [to[x].close for x in xrange(NR_OF_BUCKETS)]
-
-def write(result_dict):
-    with open('intersection.txt', 'w') as f:
-        for k, value in result_dict.iteritems():
-            for v in value:
-                f.write(v)
 
 def usage():
     print __doc__
@@ -109,7 +124,7 @@ def main(argv):
     s = init_buckets('s')
     partition(R, r)
     partition(S, s)
-    write(join_buckets(r, s))
+    join_buckets(r, s)
     elapsed_time = time() - start_time
     print elapsed_time
 
