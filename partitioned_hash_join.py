@@ -101,7 +101,7 @@ def main(argv):
     R = None
     S = None
     try:
-        opts, args = getopt(argv, 'hr:s:b:', ['help', 'file1=', 'file2=', 'buckets='])
+        opts, args = getopt(argv, 'hr:s:', ['help', 'file1=', 'file2='])
     except GetoptError as err:
         print str(err)
         usage()
