@@ -28,7 +28,7 @@ LETTER_TO_VALUE = dict((letter, 10**idx) for (idx, letter) in enumerate(LETTERS)
 
 def build_hash_table(from_file):
     hash_table = dict()
-    with open(from_file.name, 'r') as f:
+    with open(from_file.name) as f:
         for line in f:
             key = line[1:11]
             value = value_for_letter(line[0])
@@ -66,7 +66,7 @@ def join_buckets(r, s):
 
 def join(hash_table, file):
     results = dict()
-    with open(file.name, 'r') as f:
+    with open(file.name) as f:
         for line in f:
             key = line[1:11]
             value = value_for_letter(line[0])
@@ -85,7 +85,7 @@ def letters_for_result(number):
     return letters
 
 def partition(src_file, to):
-    with open(src_file, 'rt') as f:
+    with open(src_file) as f:
         for line in f:
             bucket = h1(line)
             to[bucket].write(line)
