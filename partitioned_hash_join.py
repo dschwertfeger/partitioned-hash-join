@@ -89,7 +89,7 @@ def partition(src_file, to):
         for line in f:
             bucket = h1(line)
             to[bucket].write(line)
-    [to[x].close for x in xrange(NR_OF_BUCKETS)]
+    [to[x].close() for x in xrange(NR_OF_BUCKETS)]
 
 def usage():
     print __doc__
