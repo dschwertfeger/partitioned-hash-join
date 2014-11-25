@@ -50,7 +50,7 @@ def h1(line):
     return int(line[1:4]) % NR_OF_BUCKETS
 ```
 
-This distributes the entries evenly to the smaller *bucket* files and makes sure that all entries of relation R and relation S end up in corresponding buckets. Each of those files has now only a size of 2.7 MB.
+This distributes the entries evenly to the smaller *bucket* files and makes sure that all entries of relation `R` and relation `S` end up in corresponding buckets. Each of those files has now only a size of 2.7 MB.
 
 ## Join phase
 
@@ -132,7 +132,7 @@ A recursive version of `sys.getsizeof()` based on this [Python recipe](http://co
 
 ## Join
 
-During the join phase only one `hash_table` is in memory. The corresponding bucket of relation S is read from the partitioned files on disk line by line to check for a match.
+During the join phase only one `hash_table` is in memory. The corresponding bucket of relation `S` is read from the partitioned files on disk line by line to check for a match.
 
 Syrupy reports a maximum memory usage of 49,112 KB (~ 48 MB) during this phase.
 
