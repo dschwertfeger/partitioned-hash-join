@@ -15,6 +15,14 @@ As the name of the project suggests, the problem is solved using a partitioned h
 
 # Running the script
 
+First, clone this repo or [download as zip](https://github.com/dschwertfeger/partitioned-hash-join/archive/master.zip):
+
+`$ git clone https://github.com/dschwertfeger/partitioned-hash-join.git`
+
+Then, change into the directory:
+
+`$ cd partitioned-hash-join`
+
 Make sure the script is executable:
 
 `$ chmod +x partitioned_hash_join.py`
@@ -26,6 +34,66 @@ The script partitions the input files into many smaller files. This might exceed
 Now, you can invoke the script, passing the files it should find the intersection for as arguments:
 
 `$ ./partitioned_hash_join.py -r file1.txt -s file2.txt`
+
+Should the input files not be in the same directory as the script itself, use `path/to/file` instead:
+
+`$ ./partitioned_hash_join.py -r path/to/file1.txt -s path/to/file2.txt`
+
+# How it works
+
+## Partitioning phase
+
+First, both input files are split into 450 smaller *bucket* files using a very simple hash function. The input file is read line by line and the hash function determines in which *bucket* to put this entry based on the first three numbers of an entry.
+
+```python
+def h1(line):
+    return int(line[1:4]) % NR_OF_BUCKETS
+```
+
+This distributes the entries evenly to the smaller *bucket* files and makes sure that all entries of relation `R` and relation `S` end up in corresponding buckets. Each of those files has now only a size of 2.7 MB.
+
+## Join phase
+
+During the join phase, the buckets of relation `R` are consecutively read into memory as a `hash_table` and the corresponding buckets of relation `S` are read line-by-line from disk to find a match.
+
+### Desgin of the hash table
+
+Since memory is limited, it is desirable to keep the memory footprint of the `hash_table` small. The `hash_table` is built using Python's [dictionary](https://docs.python.org/2/tutorial/datastructures.html#dictionaries) data type. The keys are the number part of an entry as strings (`'4525879378'`) and the values are integers encoding the presence of letters for that key. A value could look like this `10011` which would encode the letters `A`, `B`, and `E`.
+
+The idea is that a letter has a value of 10 to the power of its index in this list:
+
+```python
+LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
+```
+
+An `A` has a value of `1` while a `J` has a value of `1,000,000,000`.
+
+So, when the `hash_table` is built, we check for every `line` of file `f` if the `key` is already in the `hash_table` and if it is, we add the value for the letter to the already existing value if we haven't seen this letter before.
+
+Here's an example:
+
+```python
+hash_table = {
+    '4525879378': 1001
+}
+```
+
+The entries `A4525879378` and `D4525879378` are stored in the `hash_table`. Let's assume the next entry we read is `B4525879378`. Then the value of `B` which is `10` is added to the already existing value, resulting in the new `hash_table`:
+
+```python
+hash_table = {
+    '4525879378': 1011
+}
+```
+
+### Joining the buckets
+
+Once the `hash_table` for relation `R` is built, the corresponsing bucket for relation `S` is read from file line by line and joined with the `hash_table` for `R`. This process is very similar to building the `hash_table` for `R`.
+
+### Writiing the results to file
+
+[tbd]
+
 
 # Memory usage
 
@@ -64,7 +132,7 @@ A recursive version of `sys.getsizeof()` based on this [Python recipe](http://co
 
 ## Join
 
-During the join phase only one `hash_table` is in memory. The corresponding bucket of relation S is read from the partitioned files on disk line by line to check for a match.
+During the join phase only one `hash_table` is in memory. The corresponding bucket of relation `S` is read from the partitioned files on disk line by line to check for a match.
 
 Syrupy reports a maximum memory usage of 49,112 KB (~ 48 MB) during this phase.
 
@@ -73,7 +141,7 @@ Syrupy reports a maximum memory usage of 49,112 KB (~ 48 MB) during this phase.
 - runs in 8 mins 47 secs on delphi
 - size of resulting file is 25.1 MB
 - RSS profiled with Syrupy does not exceed 49,112 KB
-- the [result file](https://dl.dropboxusercontent.com/u/22040079/intersection.txt) `intersection.txt` contains 2,092,935 entries (`$ wc -l intersection.txt`)
+- the [result file](https://dl.dropboxusercontent.com/u/22040079/intersection.txt) `intersection.txt` contains 2,092,935 entries (`$ wc -l intersection.txt`)  
 
 # Development
 
